@@ -1,0 +1,284 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "Is your player from India?",
+      "attribute": "indian",
+      "category": "demographics",
+      "expected_split": { "yes": 0.65, "no": 0.35 },
+      "discriminating": true
+    },
+    {
+      "id": 2,
+      "question": "Is your player from another country (overseas)?",
+      "attribute": "overseas",
+      "category": "demographics",
+      "expected_split": { "yes": 0.35, "no": 0.65 },
+      "discriminating": true
+    },
+    {
+      "id": 3,
+      "question": "Does your player keep wickets?",
+      "attribute": "wicketkeeper",
+      "category": "role",
+      "expected_split": { "yes": 0.15, "no": 0.85 },
+      "discriminating": true
+    },
+    {
+      "id": 4,
+      "question": "Is your player primarily a bowler?",
+      "attribute": "bowler",
+      "category": "role",
+      "expected_split": { "yes": 0.30, "no": 0.70 },
+      "discriminating": true
+    },
+    {
+      "id": 5,
+      "question": "Is your player an all-rounder (contributes with both bat and ball)?",
+      "attribute": "all_rounder",
+      "category": "role",
+      "expected_split": { "yes": 0.25, "no": 0.75 },
+      "discriminating": true
+    },
+    {
+      "id": 6,
+      "question": "Has your player captained an IPL team?",
+      "attribute": "captain",
+      "category": "leadership",
+      "expected_split": { "yes": 0.12, "no": 0.88 },
+      "discriminating": true
+    },
+    {
+      "id": 7,
+      "question": "Is your player primarily a batsman?",
+      "attribute": "batsman",
+      "category": "role",
+      "expected_split": { "yes": 0.50, "no": 0.50 },
+      "discriminating": true
+    },
+    {
+      "id": 8,
+      "question": "Is your player left-handed?",
+      "attribute": "left_handed",
+      "category": "batting_style",
+      "expected_split": { "yes": 0.25, "no": 0.75 },
+      "discriminating": true
+    },
+    {
+      "id": 9,
+      "question": "Is your player known as a finisher?",
+      "attribute": "finisher",
+      "category": "playing_style",
+      "expected_split": { "yes": 0.20, "no": 0.80 },
+      "discriminating": true
+    },
+    {
+      "id": 10,
+      "question": "Does your player open the batting?",
+      "attribute": "opener",
+      "category": "position",
+      "expected_split": { "yes": 0.25, "no": 0.75 },
+      "discriminating": true
+    },
+    {
+      "id": 11,
+      "question": "Is your player an aggressive batsman?",
+      "attribute": "aggressive_batter",
+      "category": "batting_style",
+      "expected_split": { "yes": 0.45, "no": 0.55 },
+      "discriminating": true
+    },
+    {
+      "id": 12,
+      "question": "Is your player an anchor (stabilizes innings)?",
+      "attribute": "anchor_batter",
+      "category": "playing_style",
+      "expected_split": { "yes": 0.25, "no": 0.75 },
+      "discriminating": true
+    },
+    {
+      "id": 13,
+      "question": "Is your player a spinner (slow bowler)?",
+      "attribute": "spinner",
+      "category": "bowling_style",
+      "expected_split": { "yes": 0.22, "no": 0.78 },
+      "discriminating": true
+    },
+    {
+      "id": 14,
+      "question": "Is your player a pacer (fast bowler)?",
+      "attribute": "pacer",
+      "category": "bowling_style",
+      "expected_split": { "yes": 0.25, "no": 0.75 },
+      "discriminating": true
+    },
+    {
+      "id": 15,
+      "question": "Is your player known as a death bowler (specializes in last overs)?",
+      "attribute": "death_bowler",
+      "category": "bowling_style",
+      "expected_split": { "yes": 0.25, "no": 0.75 },
+      "discriminating": true
+    },
+    {
+      "id": 16,
+      "question": "Is your player a mystery spinner?",
+      "attribute": "mystery_spinner",
+      "category": "bowling_style",
+      "expected_split": { "yes": 0.05, "no": 0.95 },
+      "discriminating": true
+    },
+    {
+      "id": 17,
+      "question": "Has your player ever won the Orange Cap (highest run scorer)?",
+      "attribute": "orange_cap",
+      "category": "achievement",
+      "expected_split": { "yes": 0.03, "no": 0.97 },
+      "discriminating": true
+    },
+    {
+      "id": 18,
+      "question": "Has your player ever won the Purple Cap (highest wicket taker)?",
+      "attribute": "purple_cap",
+      "category": "achievement",
+      "expected_split": { "yes": 0.03, "no": 0.97 },
+      "discriminating": true
+    },
+    {
+      "id": 19,
+      "question": "Has your player won an IPL title?",
+      "attribute": "title_winner",
+      "category": "achievement",
+      "expected_split": { "yes": 0.20, "no": 0.80 },
+      "discriminating": true
+    },
+    {
+      "id": 20,
+      "question": "Has your player won MVP award?",
+      "attribute": "MVP_award",
+      "category": "achievement",
+      "expected_split": { "yes": 0.05, "no": 0.95 },
+      "discriminating": true
+    },
+    {
+      "id": 21,
+      "question": "Is your player still active in the IPL?",
+      "attribute": "active",
+      "category": "status",
+      "expected_split": { "yes": 0.60, "no": 0.40 },
+      "discriminating": true
+    },
+    {
+      "id": 22,
+      "question": "Is your player retired from the IPL?",
+      "attribute": "retired",
+      "category": "status",
+      "expected_split": { "yes": 0.30, "no": 0.70 },
+      "discriminating": true
+    },
+    {
+      "id": 23,
+      "question": "Is your player an explosive opener?",
+      "attribute": "explosive_opener",
+      "category": "batting_style",
+      "expected_split": { "yes": 0.20, "no": 0.80 },
+      "discriminating": true
+    },
+    {
+      "id": 24,
+      "question": "Is your player a powerplay specialist?",
+      "attribute": "powerplay_specialist",
+      "category": "batting_style",
+      "expected_split": { "yes": 0.30, "no": 0.70 },
+      "discriminating": true
+    },
+    {
+      "id": 25,
+      "question": "Is your player a death overs specialist?",
+      "attribute": "death_overs_specialist",
+      "category": "bowling_style",
+      "expected_split": { "yes": 0.30, "no": 0.70 },
+      "discriminating": true
+    },
+    {
+      "id": 26,
+      "question": "Has your player played for Chennai Super Kings (CSK)?",
+      "attribute": "played_CSK",
+      "category": "team",
+      "expected_split": { "yes": 0.15, "no": 0.85 },
+      "discriminating": false
+    },
+    {
+      "id": 27,
+      "question": "Has your player played for Royal Challengers Bangalore (RCB)?",
+      "attribute": "played_RCB",
+      "category": "team",
+      "expected_split": { "yes": 0.15, "no": 0.85 },
+      "discriminating": false
+    },
+    {
+      "id": 28,
+      "question": "Has your player played for Mumbai Indians (MI)?",
+      "attribute": "played_MI",
+      "category": "team",
+      "expected_split": { "yes": 0.15, "no": 0.85 },
+      "discriminating": false
+    },
+    {
+      "id": 29,
+      "question": "Has your player played for Kolkata Knight Riders (KKR)?",
+      "attribute": "played_kkr",
+      "category": "team",
+      "expected_split": { "yes": 0.12, "no": 0.88 },
+      "discriminating": false
+    },
+    {
+      "id": 30,
+      "question": "Has your player played for Sunrisers Hyderabad (SRH)?",
+      "attribute": "played_srh",
+      "category": "team",
+      "expected_split": { "yes": 0.12, "no": 0.88 },
+      "discriminating": false
+    },
+    {
+      "id": 31,
+      "question": "Has your player played for Delhi Capitals (DC)?",
+      "attribute": "played_dc",
+      "category": "team",
+      "expected_split": { "yes": 0.12, "no": 0.88 },
+      "discriminating": false
+    },
+    {
+      "id": 32,
+      "question": "Has your player played for Gujarat Titans (GT)?",
+      "attribute": "played_gt",
+      "category": "team",
+      "expected_split": { "yes": 0.10, "no": 0.90 },
+      "discriminating": false
+    },
+    {
+      "id": 33,
+      "question": "Has your player played for Lucknow Super Giants (LSG)?",
+      "attribute": "played_lsg",
+      "category": "team",
+      "expected_split": { "yes": 0.10, "no": 0.90 },
+      "discriminating": false
+    },
+    {
+      "id": 34,
+      "question": "Has your player played for Punjab Kings (PBKS)?",
+      "attribute": "played_pbks",
+      "category": "team",
+      "expected_split": { "yes": 0.12, "no": 0.88 },
+      "discriminating": false
+    },
+    {
+      "id": 35,
+      "question": "Has your player played for Rajasthan Royals (RR)?",
+      "attribute": "played_rr",
+      "category": "team",
+      "expected_split": { "yes": 0.12, "no": 0.88 },
+      "discriminating": false
+    }
+  ]
+}

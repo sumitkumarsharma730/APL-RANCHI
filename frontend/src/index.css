@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ipl-gold: #D4AF37;
+  --ipl-orange: #F05A28;
+  --ipl-cyan: #00D4FF;
+  --ipl-dark: #0A0A0F;
+  --ipl-card: #13131A;
+  --ipl-border: #1F1F2E;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-ipl-dark text-white font-sans antialiased;
+  background: linear-gradient(135deg, #0A0A0F 0%, #13131A 50%, #0A0A0F 100%);
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #13131A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #D4AF37, #F05A28);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #F05A28, #D4AF37);
+}
+
+/* Glassmorphism utility */
+.glass {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
+}
+
+.glass-card {
+  @apply glass rounded-2xl;
+}
+
+/* Glow effects */
+.glow-gold {
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+}
+
+.glow-orange {
+  box-shadow: 0 0 30px rgba(240, 90, 40, 0.4);
+}
+
+/* Gradient text */
+.gradient-text {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #D4AF37 0%, #F05A28 100%);
+}
+
+/* Noise texture overlay */
+.noise-overlay {
+  position: relative;
+}
+
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+/* Animated gradient border */
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(135deg, #D4AF37, #F05A28, #00D4FF, #D4AF37);
+  background-size: 300% 300%;
+  animation: gradient-shift 4s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Focus styles */
+*:focus-visible {
+  @apply outline-none ring-2 ring-ipl-gold ring-offset-2 ring-offset-ipl-dark;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(212, 175, 55, 0.3);
+  color: white;
+}
