@@ -3,84 +3,106 @@ import { useState, useCallback } from 'react'
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 /**
+ * Custom error class for API errors
+ */
+export class ApiError extends Error {
+  constructor(message, status, code) {
+    super(message)
+    this.status = status
+    this.code = code
+  }
+}
+
+/**
  * API service for connecting to the backend
+ * Properly handles errors, timeouts, and response validation
  */
 export const api = {
   /**
-   * Start a new game
+   * Make a fetch request with error handling
    */
-  async startGame() {
-    const response = await fetch(`${API_BASE}/game/start`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    })
-    const data = await response.json()
-    return data
+  async request(endpoint, options = {}) {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 30000)
+
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
+        ...options,
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers
+        }
+      })
+
+      clearTimeout(timeout)
+
+      let data
+      try {
+        data = await response.json()
+      } catch {
+        throw new ApiError('Invalid JSON response from server', response.status, 'PARSE_ERROR')
+      }
+
+      if (!response.ok) {
+        const errorMessage = data?.error?.message || `HTTP ${response.status}: ${response.statusText}`
+        throw new ApiError(errorMessage, response.status, data?.error?.code || 'REQUEST_FAILED')
+      }
+
+      if (!data.success) {
+        throw new ApiError(data?.error?.message || 'Request failed', response.status, data?.error?.code)
+      }
+
+      return data
+
+    } catch (error) {
+      clearTimeout(timeout)
+
+      if (error.name === 'AbortError') {
+        throw new ApiError('Request timed out', 408, 'TIMEOUT')
+      }
+
+      if (error instanceof ApiError) {
+        throw error
+      }
+
+      throw new ApiError(error.message || 'Network error', 0, 'NETWORK_ERROR')
+    }
   },
 
-  /**
-   * Submit answer to current question
-   */
+  async healthCheck() {
+    return this.request('/game/health')
+  },
+
+  async startGame() {
+    return this.request('/game/start', { method: 'POST' })
+  },
+
   async submitAnswer(sessionId, questionId, answer) {
-    const response = await fetch(`${API_BASE}/game/${sessionId}/answer`, {
+    return this.request(`/game/${sessionId}/answer`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ questionId, answer })
     })
-    const data = await response.json()
-    return data
   },
 
-  /**
-   * Submit feedback on AI guess
-   */
   async submitFeedback(sessionId, correct) {
-    const response = await fetch(`${API_BASE}/game/${sessionId}/feedback`, {
+    return this.request(`/game/${sessionId}/feedback`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ correct })
     })
-    const data = await response.json()
-    return data
   },
 
-  /**
-   * Get current game state
-   */
   async getGameState(sessionId) {
-    const response = await fetch(`${API_BASE}/game/${sessionId}`, {
-      method: 'GET'
-    })
-    const data = await response.json()
-    return data
+    return this.request(`/game/${sessionId}`, { method: 'GET' })
   },
 
-  /**
-   * Restart game
-   */
   async restartGame(sessionId) {
-    const response = await fetch(`${API_BASE}/game/${sessionId}/restart`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    })
-    const data = await response.json()
-    return data
-  },
-
-  /**
-   * Health check
-   */
-  async healthCheck() {
-    const response = await fetch(`${API_BASE}/game/health`, {
-      method: 'GET'
-    })
-    return response.json()
+    return this.request(`/game/${sessionId}/restart`, { method: 'POST' })
   }
 }
 
 /**
  * Hook for managing game session
- * Connects frontend to the backend API
  */
 export function useGameSession() {
   const [state, setState] = useState({
@@ -90,33 +112,32 @@ export function useGameSession() {
     confidence: 0,
     remainingCandidates: 0,
     askedQuestions: [],
-    status: 'playing',
+    status: 'idle',
     guess: null,
     error: null
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  /**
-   * Start a new game session
-   */
+  const clearError = useCallback(() => {
+    setError(null)
+    setState(prev => ({ ...prev, error: null }))
+  }, [])
+
   const startGame = useCallback(async () => {
     setIsLoading(true)
     setError(null)
+    clearError()
 
     try {
       const result = await api.startGame()
 
-      if (!result.success) {
-        throw new Error(result.error?.message || 'Failed to start game')
-      }
-
       setState({
         sessionId: result.sessionId,
         currentQuestion: result.question,
-        questionNumber: result.questionNumber,
-        confidence: result.confidence,
-        remainingCandidates: result.remainingCandidates,
+        questionNumber: result.questionNumber || 1,
+        confidence: result.confidence || 0,
+        remainingCandidates: result.remainingCandidates || 0,
         askedQuestions: [],
         status: 'playing',
         guess: null,
@@ -126,38 +147,38 @@ export function useGameSession() {
       return result
 
     } catch (err) {
-      setError(err.message || 'Failed to start game. Please try again.')
+      const errorMsg = err.message || 'Failed to start game. Please try again.'
+      setError(errorMsg)
       throw err
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [clearError])
 
-  /**
-   * Submit an answer to the current question
-   */
   const submitAnswer = useCallback(async (answer) => {
-    if (!state.sessionId || !state.currentQuestion) {
-      setError('No active game session')
-      return
+    if (!state.sessionId) {
+      const err = new Error('No active game session')
+      setError(err.message)
+      throw err
+    }
+
+    if (!state.currentQuestion) {
+      const err = new Error('No question to answer')
+      setError(err.message)
+      throw err
     }
 
     setIsLoading(true)
+    setError(null)
 
     try {
-      const result = await api.submitAnswer(
-        state.sessionId,
-        state.currentQuestion.id,
-        answer
-      )
+      const questionId = state.currentQuestion.id !== undefined
+        ? state.currentQuestion.id
+        : state.currentQuestion.text
 
-      if (!result.success) {
-        throw new Error(result.error?.message || 'Failed to submit answer')
-      }
+      const result = await api.submitAnswer(state.sessionId, questionId, answer)
 
-      // Update state based on result
       if (result.status === 'guess') {
-        // AI made a guess!
         setState(prev => ({
           ...prev,
           questionNumber: result.questionNumber,
@@ -167,7 +188,6 @@ export function useGameSession() {
           error: null
         }))
       } else if (result.status === 'continue') {
-        // Continue asking questions
         setState(prev => ({
           ...prev,
           currentQuestion: result.question,
@@ -178,7 +198,6 @@ export function useGameSession() {
           error: null
         }))
       } else if (result.status === 'complete') {
-        // Out of questions, best guess made
         setState(prev => ({
           ...prev,
           status: 'guessing',
@@ -191,20 +210,19 @@ export function useGameSession() {
       return result
 
     } catch (err) {
-      setError(err.message || 'Failed to submit answer. Please try again.')
+      const errorMsg = err.message || 'Failed to submit answer. Please try again.'
+      setError(errorMsg)
       throw err
     } finally {
       setIsLoading(false)
     }
   }, [state.sessionId, state.currentQuestion])
 
-  /**
-   * Submit feedback (correct/incorrect guess)
-   */
   const submitFeedback = useCallback(async (isCorrect) => {
     if (!state.sessionId) {
-      setError('No active game session')
-      return
+      const err = new Error('No active game session')
+      setError(err.message)
+      throw err
     }
 
     setIsLoading(true)
@@ -212,48 +230,37 @@ export function useGameSession() {
     try {
       const result = await api.submitFeedback(state.sessionId, isCorrect)
 
-      if (!result.success) {
-        throw new Error(result.error?.message || 'Failed to submit feedback')
-      }
-
       setState(prev => ({
         ...prev,
-        status: isCorrect ? 'complete' : 'feedback',
+        status: isCorrect ? 'complete' : 'feedback'
       }))
 
       return result
 
     } catch (err) {
-      setError(err.message || 'Failed to submit feedback.')
+      const errorMsg = err.message || 'Failed to submit feedback.'
+      setError(err.message)
       throw err
     } finally {
       setIsLoading(false)
     }
   }, [state.sessionId])
 
-  /**
-   * Reset the game (start fresh)
-   */
   const resetGame = useCallback(async () => {
-    if (state.sessionId) {
-      try {
-        await api.restartGame(state.sessionId)
-      } catch (err) {
-        // If restart fails, just start a new game
-      }
-    }
-
-    // Start new game
-    await startGame()
-  }, [state.sessionId, startGame])
-
-  /**
-   * Clear error
-   */
-  const clearError = useCallback(() => {
+    setState({
+      sessionId: null,
+      currentQuestion: null,
+      questionNumber: 0,
+      confidence: 0,
+      remainingCandidates: 0,
+      askedQuestions: [],
+      status: 'idle',
+      guess: null,
+      error: null
+    })
     setError(null)
   }, [])
-
+ 
   return {
     state,
     isLoading,

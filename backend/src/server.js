@@ -15,7 +15,7 @@ const players = loadPlayers();
 const questions = loadQuestions();
 
 // Configuration
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || 'localhost';
 
 // Start server
